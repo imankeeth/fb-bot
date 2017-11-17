@@ -16,9 +16,16 @@ var _morgan = require('morgan');
 
 var _morgan2 = _interopRequireDefault(_morgan);
 
+var _dotenv = require('dotenv');
+
+var _dotenv2 = _interopRequireDefault(_dotenv);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+_dotenv2.default.config();
+
 var app = (0, _express2.default)();
+var PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 
 app.set('port', process.env.PORT || 3000);
 

@@ -2,8 +2,12 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import request from 'request';
 import morgan from 'morgan';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
+const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 
 app.set('port', (process.env.PORT || 3000));
 
