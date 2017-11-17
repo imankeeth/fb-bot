@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js --exec babel-node"
+    "build": "rimraf dist/ && babel ./ --out-dir dist/ --ignore ./node_modules,./.babelrc,./package.json,./npm-debug.log --copy-files",
+    "start": "npm run build && node dist/index.js"
   },
   "keywords": [
     "Chatbot",
@@ -19,7 +20,8 @@
     "express": "^4.16.2",
     "morgan": "^1.9.0",
     "nodemon": "^1.12.1",
-    "request": "^2.83.0"
+    "request": "^2.83.0",
+    "rimraf": "^2.6.2"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
