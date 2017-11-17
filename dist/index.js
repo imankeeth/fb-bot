@@ -81,6 +81,11 @@ app.get('/webhook', function (req, res) {
   }
 });
 
+// Index route
+app.get('/', function (req, res) {
+  return res.send('Hello world, I am a chat bot');
+});
+
 // Listen to the server
 app.listen(app.get('port'), function () {
   return console.log('running on port', app.get('port'));
