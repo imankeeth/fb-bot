@@ -1,16 +1,18 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import request from 'request';
+import morgan from 'morgan';
 
 const app = express();
 
 app.set('port', (process.env.PORT || 3000));
 
 // Process application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({extended: false}))
-
+app.use(bodyParser.urlencoded({ extended: false }));
 // Process application/json
-app.use(bodyParser.json())
+app.use(bodyParser.json());
+// adding logger
+app.use(morgan("dev"));
 
 // Index route
 app.get('/', (req, res) => res.send('Hello world, I am a chat bot'));
