@@ -43,18 +43,20 @@ app.post('/webhook', function (req, res) {
 
   // Checks this is an event from a page subscription
   if (body.object === 'page') {
-
-    // Iterates over each entry - there may be multiple if batched
-    body.entry.forEach(function (entry) {
-
-      // Gets the message. entry.messaging is an array, but 
-      // will only ever contain one message, so we get index 0
-      var webhookEvent = entry.messaging[0];
-      console.log(webhookEvent);
-    });
-
-    // Returns a '200 OK' response to all requests
-    res.status(200).send('EVENT_RECEIVED');
+    var messaging_events = req.body.entry[0].messaging;
+    for (var i = 0; i < messaging_events.length; i++) {
+      var event = req.body.entry[0].messaging[i];
+      var sender = event.sender.id;
+      if (event.message && event.message.text) {
+        var text = event.message.text;
+        if (text === 'Generic') {
+          sendGenericMessage(sender);
+          continue;
+        }
+        sendTextMessage(sender, "Text received, echo: " + text.substring(0, 200));
+      }
+    }
+    res.sendStatus(200);
   } else {
     // Returns a '404 Not Found' if event is not from a page subscription
     res.sendStatus(404);
@@ -92,6 +94,74 @@ app.get('/webhook', function (req, res) {
 app.get('/', function (req, res) {
   return res.send('Hello world, I am a chat bot');
 });
+
+function sendTextMessage(sender, text) {
+  var messageData = { text: text };
+  (0, _request2.default)({
+    url: 'https://graph.facebook.com/v2.6/me/messages',
+    qs: { access_token: PAGE_ACCESS_TOKEN },
+    method: 'POST',
+    json: {
+      recipient: { id: sender },
+      message: messageData
+    }
+  }, function (error, response, body) {
+    if (error) {
+      console.log('Error sending messages: ', error);
+    } else if (response.body.error) {
+      console.log('Error: ', response.body.error);
+    }
+  });
+}
+
+function sendGenericMessage(sender) {
+  var messageData = {
+    attachment: {
+      type: "template",
+      payload: {
+        template_type: "generic",
+        elements: [{
+          title: "First card",
+          subtitle: "Element #1 of an hscroll",
+          image_url: "https://openclipart.org/image/800px/svg_to_png/246322/Badeendje.png",
+          buttons: [{
+            type: "web_url",
+            url: "https://www.messenger.com",
+            title: "web url"
+          }, {
+            type: "postback",
+            title: "Postback",
+            payload: "Payload for first element in a generic bubble"
+          }]
+        }, {
+          title: "Second card",
+          subtitle: "Element #2 of an hscroll",
+          image_url: "https://openclipart.org/image/800px/svg_to_png/246322/Badeendje.png",
+          buttons: [{
+            type: "postback",
+            title: "Postback",
+            payload: "Payload for second element in a generic bubble"
+          }]
+        }]
+      }
+    }
+  };
+  (0, _request2.default)({
+    url: "https://graph.facebook.com/v2.6/me/messages",
+    qs: { access_token: PAGE_ACCESS_TOKEN },
+    method: "POST",
+    json: {
+      recipient: { id: sender },
+      message: messageData
+    }
+  }, function (error, response, body) {
+    if (error) {
+      console.log("Error sending messages: ", error);
+    } else if (response.body.error) {
+      console.log("Error: ", response.body.error);
+    }
+  });
+}
 
 // Listen to the server
 app.listen(app.get('port'), function () {
